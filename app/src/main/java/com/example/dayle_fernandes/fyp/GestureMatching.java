@@ -2,13 +2,11 @@ package com.example.dayle_fernandes.fyp;
 
 
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Color;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.icu.text.AlphabeticIndex;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -28,22 +26,17 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
-import static android.R.attr.start;
-import static android.os.Build.VERSION_CODES.M;
 import static com.example.dayle_fernandes.fyp.R.id.comp_graph;
 import static com.example.dayle_fernandes.fyp.R.id.gest_graph;
-import static com.example.dayle_fernandes.fyp.R.id.graph;
-import static com.example.dayle_fernandes.fyp.RecordGesture.SAVE_DIRECTORY;
 
 public class GestureMatching extends Activity implements SensorEventListener{
 
@@ -95,7 +88,7 @@ public class GestureMatching extends Activity implements SensorEventListener{
                         e.printStackTrace();
                     }
                     double[][] recordedGesture = GestureCompare.preProcess(sensorLog);
-                    if(compareDistance(recordedGesture)){
+                    if(compareDistance(recordedGesture,sensorLog)){
                         Log.d("Gesture Match:", "True");
                         Toast.makeText(GestureMatching.this,"Gesture match: True",Toast.LENGTH_SHORT).show();
                     }
@@ -253,10 +246,27 @@ public class GestureMatching extends Activity implements SensorEventListener{
 
     }
 
-    private boolean compareDistance(double[][] recordedGesture){
+    public double calculateGestureTime(ArrayList<Pair<Long,double[]>> sensorLog){
+        long[] times = new long[sensorLog.size()];
+
+        for(int i = 0; i < sensorLog.size(); i++){
+            Long t = sensorLog.get(i).first;
+            times[i] = t;
+        }
+        long start = times[0];
+        long end = times[sensorLog.size() - 1];
+        long elapsedTime = end - start;
+        double gestureTime = (double) TimeUnit.MILLISECONDS.convert(elapsedTime, TimeUnit.NANOSECONDS);
+        return gestureTime;
+    }
+
+    private boolean compareDistance(double[][] recordedGesture, ArrayList<Pair<Long,double[]>> sensorLog){
         FileInputStream c1fis, c2fis, c3fis;
         ObjectInputStream c1ois, c2ois, c3ois;
         double[][] gesture1, gesture2, gesture3;
+        double currentGestureTime = calculateGestureTime(sensorLog);
+        double averageGestureTime = RecordGesture.getAverageGestureTime();
+        boolean flag = false;
 
         try{
             c1fis = new FileInputStream(new File(this.getFilesDir(), RecordGesture.SAVE_DIRECTORY + "gesture0"));
@@ -277,22 +287,27 @@ public class GestureMatching extends Activity implements SensorEventListener{
             double initial_gesture_distance = RecordGesture.getDistance();
 
             double gesture_ratio = average_distance/initial_gesture_distance;
+            double time_ratio = currentGestureTime/averageGestureTime;
 
             Log.d("Initial Distance:", Double.toString(initial_gesture_distance));
             Log.d("Average Distance:", Double.toString(average_distance));
             Log.d("Gesture Ratio:", Double.toString(gesture_ratio));
+            Log.d("Time Ratio:", Double.toString(time_ratio));
 
             if(gesture_ratio < 1.2 && gesture_ratio > 0.8){
-                return true;
+                if(time_ratio < 1.2 && time_ratio > 0.8){
+                    flag =  true;
+                }
             }
             else{
-                return false;
+                flag =  false;
             }
 
         }catch (Exception e){
             e.printStackTrace();
-            return true;
+            flag =  false;
         }
+        return flag;
 
     }
 

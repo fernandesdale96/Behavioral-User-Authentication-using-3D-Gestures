@@ -110,10 +110,7 @@ public class GestureCompare {
         }
         int ps = Math.min(Math.min(ps_arr[0], ps_arr[1]), ps_arr[2]);
         int pe = Math.max(Math.max(pe_arr[0], pe_arr[1]), pe_arr[2]);
-        /*String as = Integer.toString(ps);
-        String aas = Integer.toString(pe);
-        Log.d("PS: ", as);
-        Log.d("PE: ", aas);*/
+
 
         double[][] subArr = new double[3][arr[0].length];
         for (int i = 0; i < 3; i++) {
