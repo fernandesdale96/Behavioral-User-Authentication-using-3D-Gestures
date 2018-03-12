@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+    <TextView
+        android:text="Please press and hold the below button to record your gesture. You may have to repeat the same gesture 3 times to be able to accurately capture your 3D gesture"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/record_text"
+        android:layout_weight="0.05" />
+
+    <com.jjoe64.graphview.GraphView
+        android:layout_width="match_parent"
+        android:layout_height="350dip"
+        android:id="@+id/graph"
+        />
+
+    <Button
+        android:text="Press and Hold to Record Gesture"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/record_gesture"
+        android:layout_weight="0.05"
+
+        />
+</LinearLayout>
