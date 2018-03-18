@@ -1,36 +1,97 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:weightSum="1">
 
     <TextView
-        android:text="Please press and hold the below button to record and compare your gesture"
+        android:id="@+id/compare_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/compare_text"
-        android:layout_weight="0.05" />
+        android:layout_weight="0.05"
+        android:text="Please press and hold the below button to record and compare your gesture" />
 
     <com.jjoe64.graphview.GraphView
-        android:layout_width="match_parent"
-        android:layout_height="250dip"
         android:id="@+id/comp_graph"
-        />
-
-    <com.jjoe64.graphview.GraphView
         android:layout_width="match_parent"
-        android:layout_marginTop="10dp"
-        android:layout_height="250dip"
-        android:id="@+id/gest_graph"
-        />
+        android:layout_height="250dip" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <Button
+            android:id="@+id/firstFragment"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="Gesture 1"
+            android:layout_marginLeft="60dp"
+             />
+        <Button
+            android:id="@+id/secondFragment"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="Gesture 2"
+            />
+        <Button
+            android:id="@+id/thirdFragment"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="Gesture 3"
+             />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <FrameLayout
+            android:id="@+id/frameLayout"
+            android:layout_width="400dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp" />
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        >
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:text="Gesture Match:"/>
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="17dp"
+            android:id="@+id/gest_match"
+            android:text=""/>
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:text="Speed Ratio:"/>
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="17dp"
+            android:id="@+id/speed_ratio"
+            android:text=""/>
+        <TextView
+            android:layout_width="70dp"
+            android:layout_height="50dp"
+            android:text="Distance Ratio:"/>
+        <TextView
+            android:layout_width="50dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="17dp"
+            android:id="@+id/distance_ratio"
+            android:text=""/>
+    </LinearLayout>
 
 
     <Button
-        android:text="Press and Hold to Record Gesture"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         android:id="@+id/record_gesture"
-        android:layout_weight="0.05"
-        />
+        android:layout_width="150dp"
+        android:layout_height="51dp"
+        android:layout_marginLeft="145dp"
+        android:text="Press and Hold to Record" />
 </LinearLayout>

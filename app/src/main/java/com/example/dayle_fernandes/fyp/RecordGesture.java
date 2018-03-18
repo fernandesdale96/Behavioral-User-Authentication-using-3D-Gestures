@@ -25,6 +25,7 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import com.opencsv.CSVWriter;
 
 import org.apache.commons.io.FileUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -40,11 +41,11 @@ import static com.example.dayle_fernandes.fyp.R.id.graph;
 
 public class RecordGesture extends Activity implements SensorEventListener {
 
-    private ArrayList<Pair<Long,double[]>> sensorLog;
+    private ArrayList<Pair<Long, double[]>> sensorLog;
     private long startTime = 0;
     private SensorManager sensorManager;
     private Sensor accelerometer;
-    private int gestureCount =0;
+    private int gestureCount = 0;
     private Button recorder;
     private static double initialDistance = 0;
     private static double averageGestureTime = 0;
@@ -55,7 +56,7 @@ public class RecordGesture extends Activity implements SensorEventListener {
 
 
     @Override
-    protected void  onCreate(Bundle savedInstanceState){
+    protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
@@ -68,41 +69,42 @@ public class RecordGesture extends Activity implements SensorEventListener {
         recorder.setOnTouchListener(hold_button_record);
     }
 
-    private View.OnTouchListener hold_button_record = new View.OnTouchListener(){
+    private View.OnTouchListener hold_button_record = new View.OnTouchListener() {
         @Override
-        public boolean onTouch(View v, MotionEvent event){
-            if(event.getAction() == MotionEvent.ACTION_DOWN){
+        public boolean onTouch(View v, MotionEvent event) {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 //Gather Sensor Data
                 sensorLog = new ArrayList<>();
                 sensorManager.registerListener(RecordGesture.this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
             }
-            if(event.getAction() == MotionEvent.ACTION_UP){
+            if (event.getAction() == MotionEvent.ACTION_UP) {
                 //Stop Gathering Sensor Data
                 Log.d("Debug:", "Up Action: Sensor Stops Recording");
                 sensorManager.unregisterListener(RecordGesture.this);
-                if(sensorLog.size() > 150){
+                if (sensorLog.size() > 150) {
                     plotSensorLog(sensorLog, gestureCount);
-                    SaveGesture(sensorLog,RecordGesture.this,gestureCount);
-                    SaveCSV(sensorLog,gestureCount);
+                    SaveGesture(sensorLog, RecordGesture.this, gestureCount);
+                    SaveCSV(sensorLog, gestureCount);
                     calculateGestureTime(sensorLog, gestureCount);
-                    Toast.makeText(RecordGesture.this,"Gesture Saved", Toast.LENGTH_SHORT).show();
                     gestureCount++;
                     String astring = Integer.toString(3 - gestureCount);
-                    Toast.makeText(RecordGesture.this,"Please repeat gesture " + astring + " more times",Toast.LENGTH_SHORT).show();
-                    if(gestureCount ==3){
-                        try{
+                    if (gestureCount != 3) {
+                        Toast.makeText(RecordGesture.this, "Gesture Saved!! Please repeat gesture " + astring + " more times", Toast.LENGTH_SHORT).show();
+                    }
+                    if (gestureCount == 3) {
+                        try {
                             averageGestureTime = calculateAverage(timeList);
                             initialDistance = getGestureDistance();
-                            Toast.makeText(RecordGesture.this,"Please repeat gesture " + astring + " more times",Toast.LENGTH_SHORT).show();
-                            Toast.makeText(RecordGesture.this,"Distance " + Double.toString(initialDistance),Toast.LENGTH_SHORT).show();
+                            Toast.makeText(RecordGesture.this, "Distance " + Double.toString(initialDistance), Toast.LENGTH_SHORT).show();
                             Log.d("Average Gesture Time:", Double.toString(averageGestureTime));
-                        }catch (Exception e){}
+                        } catch (Exception e) {
+                        }
 
                         final Handler handler = new Handler();
                         handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
-                                Intent intent = new Intent(RecordGesture.this,MainActivity.class);
+                                Intent intent = new Intent(RecordGesture.this, MainActivity.class);
                                 startActivity(intent);
                                 finish();
                             }
@@ -110,9 +112,8 @@ public class RecordGesture extends Activity implements SensorEventListener {
 
                     }
 
-                }
-                else{
-                    Toast.makeText(RecordGesture.this,"Gesture is not long enough, please try again",Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(RecordGesture.this, "Gesture is not long enough, please try again", Toast.LENGTH_SHORT).show();
                     Log.d("Log Size:", Integer.toString(sensorLog.size()));
                 }
             }
@@ -120,7 +121,7 @@ public class RecordGesture extends Activity implements SensorEventListener {
         }
     };
 
-    public void plotSensorLog(ArrayList<Pair<Long,double[]>> sensorLog, int gnum){
+    public void plotSensorLog(ArrayList<Pair<Long, double[]>> sensorLog, int gnum) {
         plot.removeAllSeries();
         long start = sensorLog.get(0).first;
         String gesture = "Gesture " + Integer.toString(gnum + 1);
@@ -129,23 +130,22 @@ public class RecordGesture extends Activity implements SensorEventListener {
         LineGraphSeries<DataPoint> yseries = new LineGraphSeries<>();
         LineGraphSeries<DataPoint> zseries = new LineGraphSeries<>();
 
-        for(int i=0; i< sensorLog.size();i++){
+        for (int i = 0; i < sensorLog.size(); i++) {
             long t = sensorLog.get(i).first;
             double[] record = sensorLog.get(i).second;
             double x = record[0];
             double y = record[1];
             double z = record[2];
 
-            if(i == 0){
-                xseries.appendData(new DataPoint(0,x), false, 250);
-                yseries.appendData(new DataPoint(0,y), false, 250);
-                zseries.appendData(new DataPoint(0,z), false, 250);
-            }
-            else{
-                double time = (t- start)/Math.pow(10,6);
-                xseries.appendData(new DataPoint(time,x),false,250);
-                yseries.appendData(new DataPoint(time,y),false,250);
-                zseries.appendData(new DataPoint(time,z),false,250);
+            if (i == 0) {
+                xseries.appendData(new DataPoint(0, x), false, 250);
+                yseries.appendData(new DataPoint(0, y), false, 250);
+                zseries.appendData(new DataPoint(0, z), false, 250);
+            } else {
+                double time = (t - start) / Math.pow(10, 6);
+                xseries.appendData(new DataPoint(time, x), false, 250);
+                yseries.appendData(new DataPoint(time, y), false, 250);
+                zseries.appendData(new DataPoint(time, z), false, 250);
             }
         }
 
@@ -169,19 +169,19 @@ public class RecordGesture extends Activity implements SensorEventListener {
 
     }
 
-    public double calculateAverage(double[] timeList){
+    public double calculateAverage(double[] timeList) {
         int sum = 0;
-        for(int i =0; i < timeList.length; i++){
+        for (int i = 0; i < timeList.length; i++) {
             sum += timeList[i];
         }
 
         return (double) sum / 3;
     }
 
-    public void calculateGestureTime(ArrayList<Pair<Long,double[]>> sensorLog, int gnum){
+    public void calculateGestureTime(ArrayList<Pair<Long, double[]>> sensorLog, int gnum) {
         long[] times = new long[sensorLog.size()];
 
-        for(int i = 0; i < sensorLog.size(); i++){
+        for (int i = 0; i < sensorLog.size(); i++) {
             Long t = sensorLog.get(i).first;
             times[i] = t;
         }
@@ -195,63 +195,67 @@ public class RecordGesture extends Activity implements SensorEventListener {
     }
 
 
-    public void SaveCSV(ArrayList<Pair<Long,double[]>> sensorLog, int gnum){
+    public void SaveCSV(ArrayList<Pair<Long, double[]>> sensorLog, int gnum) {
         File sdcard = Environment.getExternalStorageDirectory();
         File dir = new File(sdcard.getAbsolutePath() + "/FYP/gesture");
         dir.mkdir();
-        try{
-            if(gnum == 0){
+        try {
+            if (gnum == 0) {
                 FileUtils.cleanDirectory(dir);
             }
-        }catch (Exception e){};
+        } catch (Exception e) {
+        }
+        ;
 
-        String fname = sdcard.getAbsolutePath()+"/FYP/gesture/" + "gesture" + Integer.toString(gnum)+".csv";
+        String fname = sdcard.getAbsolutePath() + "/FYP/gesture/" + "gesture" + Integer.toString(gnum) + ".csv";
 
 
-        try{
+        try {
             CSVWriter writer = new CSVWriter(new FileWriter(fname, true));
-            for(int i=0; i< sensorLog.size();i++){
+            for (int i = 0; i < sensorLog.size(); i++) {
                 Long t = sensorLog.get(i).first;
                 double[] record = sensorLog.get(i).second;
                 double x = record[0];
                 double y = record[1];
                 double z = record[2];
-                String[] append = new String[] {Long.toString(t), Double.toString(x), Double.toString(y),Double.toString(z)};
+                String[] append = new String[]{Long.toString(t), Double.toString(x), Double.toString(y), Double.toString(z)};
                 writer.writeNext(append);
             }
             writer.close();
             Log.d("CSV Save:", "Success");
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
-            Log.d("CSV Save:","Error");
+            Log.d("CSV Save:", "Error");
         }
 
     }
 
-    public void SaveGesture(ArrayList<Pair<Long,double[]>> sensorLog, Activity act, int gesturNum){
-        File gestureDir = new File(act.getFilesDir(),SAVE_DIRECTORY);
+    public void SaveGesture(ArrayList<Pair<Long, double[]>> sensorLog, Activity act, int gesturNum) {
+        File gestureDir = new File(act.getFilesDir(), SAVE_DIRECTORY);
         gestureDir.mkdir();
-        try{
-            if(gesturNum == 0){
+        try {
+            if (gesturNum == 0) {
                 FileUtils.cleanDirectory(gestureDir);
             }
-        }catch (Exception e){};
+        } catch (Exception e) {
+        }
+        ;
 
         String fname = "gesture" + Integer.toString(gesturNum);
 
         File gesture = new File(gestureDir, fname);
         FileOutputStream fos;
-        try{
+        try {
             fos = new FileOutputStream(gesture);
             ObjectOutputStream os = new ObjectOutputStream(fos);
             double[][] sensorData = GestureCompare.preProcess(sensorLog);
             os.writeObject(sensorData);
-            Log.d("File Save:","Success");
+            Log.d("File Save:", "Success");
 
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(act, "File could not be saved", Toast.LENGTH_SHORT).show();
-            Log.d("File Save:","Error");
+            Log.d("File Save:", "Error");
         }
     }
 
@@ -295,25 +299,29 @@ public class RecordGesture extends Activity implements SensorEventListener {
 //Do nothing
     }
 
-    public static double getDistance(){
+    public static double getDistance() {
         return initialDistance;
     }
-    public static double getAverageGestureTime() {return averageGestureTime;}
+
+    public static double getAverageGestureTime() {
+        return averageGestureTime;
+    }
+
     private double getGestureDistance() throws IOException, ClassNotFoundException {
-        FileInputStream c1fis,c2fis ;
+        FileInputStream c1fis, c2fis;
         ObjectInputStream c1ois, c2ois;
 
-        double[][] gesture1 , gesture2;
-        c1fis = new FileInputStream(new File(this.getFilesDir(),SAVE_DIRECTORY+"gesture0"));
-        c2fis = new FileInputStream(new File(this.getFilesDir(),SAVE_DIRECTORY+"gesture1"));
+        double[][] gesture1, gesture2;
+        c1fis = new FileInputStream(new File(this.getFilesDir(), SAVE_DIRECTORY + "gesture0"));
+        c2fis = new FileInputStream(new File(this.getFilesDir(), SAVE_DIRECTORY + "gesture1"));
         c1ois = new ObjectInputStream(c1fis);
         c2ois = new ObjectInputStream(c2fis);
-        gesture1 = (double[][])c1ois.readObject();
-        gesture2 = (double[][])c2ois.readObject();
+        gesture1 = (double[][]) c1ois.readObject();
+        gesture2 = (double[][]) c2ois.readObject();
         double[][] gesture3 = GestureCompare.preProcess(sensorLog);
-        double initdist =  (GestureCompare.computePathDistance(gesture1,gesture2) +
-                GestureCompare.computePathDistance(gesture2,gesture3) +
-                GestureCompare.computePathDistance(gesture1,gesture3)) /3;
+        double initdist = (GestureCompare.computePathDistance(gesture1, gesture2) +
+                GestureCompare.computePathDistance(gesture2, gesture3) +
+                GestureCompare.computePathDistance(gesture1, gesture3)) / 3;
         String astr = Double.toString(initdist);
         System.out.print(astr);
         Log.d("Initial Distance", astr);
