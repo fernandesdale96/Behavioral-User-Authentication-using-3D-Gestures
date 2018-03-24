@@ -18,33 +18,23 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
-import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 
 import static com.example.dayle_fernandes.fyp.R.id.comp_graph;
-//import static com.example.dayle_fernandes.fyp.R.id.gest_graph1;
-import static com.example.dayle_fernandes.fyp.R.id.speed_ratio;
-import static com.example.dayle_fernandes.fyp.R.id.time;
-//import static com.example.dayle_fernandes.fyp.R.id.gest_graph2;
-//import static com.example.dayle_fernandes.fyp.R.id.gest_graph3;
 
 public class GestureMatching extends Activity implements SensorEventListener {
 
@@ -57,9 +47,6 @@ public class GestureMatching extends Activity implements SensorEventListener {
     private Button recorder;
     int gnum;
     GraphView plot;
-   //GraphView plot1;
-    GraphView plot2;
-    GraphView plot3;
     TextView gesture_match;
     TextView speed_ratio;
     TextView distance_ratio;

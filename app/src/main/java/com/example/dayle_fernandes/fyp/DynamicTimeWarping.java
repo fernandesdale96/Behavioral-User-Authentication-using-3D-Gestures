@@ -21,8 +21,6 @@ public class DynamicTimeWarping {
         int rows = template.length;
         //To Create NxM Dynamic Time Warping Matrix
         Array2DRowRealMatrix mat = new Array2DRowRealMatrix(template[0].length,pattern[0].length);
-        //String nm = " ";
-        //String snm = " ";
         //Normailizing Sensor Data
         //Ensure the features used have 0 mean and unit variance
         for(int i =0;i<rows;i++){
@@ -38,13 +36,12 @@ public class DynamicTimeWarping {
             //Normailze all values in the row
             for(int j =0; j < template_temp.length;j++){
                 template_temp[j] = (template_temp[j] - template_mean)/template_std;
-                //nm = Double.toString(template_temp[j]);
 
             }
 
             for(int j =0; j < pattern_temp.length;j++){
                 pattern_temp[j] = (pattern_temp[j] - pattern_mean)/pattern_std;
-                //snm = Double.toString(pattern_temp[j]);
+
             }
 
             Array2DRowRealMatrix template_remap = remap(pattern_temp.length,template_temp);
@@ -61,22 +58,16 @@ public class DynamicTimeWarping {
 
         }
 
-        /*Log.d("Before warping:", nm);
-        Log.d("Before warping 2:", snm);
-*/
         Log.d("Time Warping:","Feature normalization complete. Start finding path");
 
         Array2DRowRealMatrix temp_mat = new Array2DRowRealMatrix(template[0].length, pattern[0].length);
         temp_mat.setEntry(0,0,mat.getEntry(0,0));
-        //Log.d("Main mat: ", Double.toString(mat.getEntry(5,2)));
-        String s = " ";
+
         for(int i =1; i < template[0].length;i++){
             temp_mat.setEntry(i,0,mat.getEntry(i,0)+temp_mat.getEntry(i-1,0));
-            //double d = mat.getEntry(i,0);
-            //s = Double.toString(d);
 
         }
-        //Log.d("Normalized Data:", s);
+
         for(int j=1; j< pattern[0].length;j++){
             temp_mat.setEntry(0,j,mat.getEntry(0,j) + temp_mat.getEntry(0,j-1));
         }
