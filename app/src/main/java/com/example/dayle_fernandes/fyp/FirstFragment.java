@@ -1,13 +1,16 @@
 package com.example.dayle_fernandes.fyp;
 
+import android.app.Activity;
 import android.app.Fragment;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
@@ -15,9 +18,19 @@ import com.jjoe64.graphview.series.LineGraphSeries;
 import com.opencsv.CSVReader;
 
 import java.io.File;
+import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import static android.R.attr.data;
+import static com.example.dayle_fernandes.fyp.RecordGesture.SAVE_DIRECTORY;
 
 /**
  * Created by dayle_fernandes on 18-Mar-18.
@@ -26,12 +39,25 @@ import java.util.List;
 public class FirstFragment extends Fragment {
     View view;
     GraphView graph;
-
+    TextView gesture_match, speed_ratio, distance_ratio;
+    GestureMatching gestureAct;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
         view = inflater.inflate(R.layout.record_gesture1, container,false);
         graph = (GraphView) view.findViewById(R.id.gest_graph1);
+        gesture_match = (TextView) view.findViewById(R.id.gest_match1);
+        speed_ratio = (TextView) view.findViewById(R.id.speed_ratio1);
+        distance_ratio = (TextView) view.findViewById(R.id.distance_ratio1);
+
+        gestureAct = (GestureMatching) getActivity();
+
+        ArrayList<Pair<Long, double[]>> sensorLog = gestureAct.sensorLog;
+        double gestureTime = gestureAct.gestureTime;
+        double[][] recordedGesture = GestureCompare.preProcess(sensorLog);
+        compareGesture(recordedGesture,gestureTime);
+
         try {
+
             plotRecordedGestures(graph, 1);
         } catch (Exception e) {
             Log.d("Plot Log:", "File Not Found");
@@ -41,6 +67,52 @@ public class FirstFragment extends Fragment {
         return view;
 
     }
+
+    public void compareGesture(double[][] recordedGesture, double gestureTime){
+        FileInputStream  c2fis;
+        ObjectInputStream  c2ois;
+        double[][]  otherGesture;
+        String path = "/data/user/0/com.example.dayle_fernandes.fyp/files/" + RecordGesture.SAVE_DIRECTORY + "gesture0";
+        boolean flag = false;
+
+        try{
+            c2fis = new FileInputStream(new File(path));
+            c2ois = new ObjectInputStream(c2fis);
+            otherGesture = (double[][]) c2ois.readObject();
+
+            double warp_distace = GestureCompare.computePathDistance(recordedGesture,otherGesture);
+            double[] timeArray = RecordGesture.getTimeList();
+            double recordTime = timeArray[0];
+
+
+            double initial_gesture_distance = RecordGesture.getDistance();
+
+            double gesture_ratio = warp_distace / initial_gesture_distance;
+            double time_ratio = gestureTime / recordTime;
+
+            distance_ratio.setText(String.format("%.4f",gesture_ratio));
+            speed_ratio.setText(String.format("%.4f",time_ratio));
+            if (gesture_ratio < 1.25 && gesture_ratio > 0.75) {
+                if (time_ratio < 1.15 && time_ratio > 0.85) {
+                    flag = true;
+                }
+            } else {
+                flag = false;
+            }
+
+            if(flag){
+                gesture_match.setText("True");
+            }else{
+                gesture_match.setText("False");
+            }
+
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     public void plotRecordedGestures(GraphView plot, int a) throws IOException {
         File sdcard = Environment.getExternalStorageDirectory();

@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import static com.example.dayle_fernandes.fyp.R.id.graph;
+import static com.example.dayle_fernandes.fyp.R.id.time;
 
 
 public class RecordGesture extends Activity implements SensorEventListener {
@@ -49,10 +50,11 @@ public class RecordGesture extends Activity implements SensorEventListener {
     private Button recorder;
     private static double initialDistance = 0;
     private static double averageGestureTime = 0;
+
     public static final String SAVE_DIRECTORY = "gestures/";
     final int REQUEST_CODE_ASK_PERMISSIONS = 123;
     private GraphView plot;
-    private double[] timeList;
+    public static double[] timeList;
 
 
     @Override
@@ -306,6 +308,8 @@ public class RecordGesture extends Activity implements SensorEventListener {
     public static double getAverageGestureTime() {
         return averageGestureTime;
     }
+
+    public static double[] getTimeList() {return timeList;}
 
     private double getGestureDistance() throws IOException, ClassNotFoundException {
         FileInputStream c1fis, c2fis;

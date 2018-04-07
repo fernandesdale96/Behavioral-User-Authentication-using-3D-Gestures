@@ -18,6 +18,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
@@ -28,17 +29,22 @@ import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 
 import static com.example.dayle_fernandes.fyp.R.id.comp_graph;
+import static com.example.dayle_fernandes.fyp.RecordGesture.SAVE_DIRECTORY;
 
 public class GestureMatching extends Activity implements SensorEventListener {
 
-    private ArrayList<Pair<Long, double[]>> sensorLog;
+    public ArrayList<Pair<Long, double[]>> sensorLog;
+    public double gestureTime;
+
     private long startTime = 0;
     private SensorManager sensorManager;
     private Sensor accelerometer;
@@ -88,7 +94,7 @@ public class GestureMatching extends Activity implements SensorEventListener {
 
         plot = (GraphView) findViewById(comp_graph);
 
-        gesture_match = (TextView) findViewById(R.id.gest_match);
+        gesture_match = (TextView) findViewById(R.id.auth_result);
         speed_ratio = (TextView) findViewById(R.id.speed_ratio);
         distance_ratio = (TextView) findViewById(R.id.distance_ratio);
 
@@ -129,6 +135,7 @@ public class GestureMatching extends Activity implements SensorEventListener {
                     compare_count++;
                 } else {
                     Log.d("Record Error:", "Gesture not Long Enough");
+                    Log.d("Log Size:",Integer.toString(sensorLog.size()));
                 }
 
             }
@@ -188,6 +195,7 @@ public class GestureMatching extends Activity implements SensorEventListener {
 
     }
 
+
     public void SaveCSV(ArrayList<Pair<Long, double[]>> sensorLog, int gnum) {
         File sdcard = Environment.getExternalStorageDirectory();
         File dir = new File(sdcard.getAbsolutePath() + "/FYP/compare");
@@ -224,7 +232,7 @@ public class GestureMatching extends Activity implements SensorEventListener {
 
     }
 
-    public double calculateGestureTime(ArrayList<Pair<Long, double[]>> sensorLog) {
+    public static double calculateGestureTime(ArrayList<Pair<Long, double[]>> sensorLog) {
         long[] times = new long[sensorLog.size()];
 
         for (int i = 0; i < sensorLog.size(); i++) {
@@ -243,14 +251,14 @@ public class GestureMatching extends Activity implements SensorEventListener {
         ObjectInputStream c1ois, c2ois, c3ois;
         double[][] gesture1, gesture2, gesture3;
         double currentGestureTime = calculateGestureTime(sensorLog);
+        gestureTime = currentGestureTime;
         double averageGestureTime = RecordGesture.getAverageGestureTime();
         boolean flag = false;
 
         try {
-            c1fis = new FileInputStream(new File(this.getFilesDir(), RecordGesture.SAVE_DIRECTORY + "gesture0"));
-            c2fis = new FileInputStream(new File(this.getFilesDir(), RecordGesture.SAVE_DIRECTORY + "gesture1"));
-            c3fis = new FileInputStream(new File(this.getFilesDir(), RecordGesture.SAVE_DIRECTORY + "gesture2"));
-
+            c1fis = new FileInputStream(new File(this.getFilesDir(), SAVE_DIRECTORY + "gesture0"));
+            c2fis = new FileInputStream(new File(this.getFilesDir(), SAVE_DIRECTORY + "gesture1"));
+            c3fis = new FileInputStream(new File(this.getFilesDir(), SAVE_DIRECTORY + "gesture2"));
             c1ois = new ObjectInputStream(c1fis);
             c2ois = new ObjectInputStream(c2fis);
             c3ois = new ObjectInputStream(c3fis);
@@ -273,8 +281,8 @@ public class GestureMatching extends Activity implements SensorEventListener {
             Log.d("Time Ratio:", Double.toString(time_ratio));
             distance_ratio.setText(String.format("%.4f",gesture_ratio));
             speed_ratio.setText(String.format("%.4f",time_ratio));
-            if (gesture_ratio < 1.2 && gesture_ratio > 0.8) {
-                if (time_ratio < 1.2 && time_ratio > 0.8) {
+            if (gesture_ratio < 1.25 && gesture_ratio > 0.75) {
+                if (time_ratio < 1.15 && time_ratio > 0.85) {
                     flag = true;
                 }
             } else {
