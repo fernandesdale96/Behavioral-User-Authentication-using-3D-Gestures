@@ -43,14 +43,14 @@ public class SecondFragment extends Fragment {
 
         gestureAct = (GestureMatching) getActivity();
 
-        ArrayList<Pair<Long, double[]>> sensorLog = gestureAct.sensorLog;
-        double gestureTime = gestureAct.gestureTime;
-        double[][] recordedGesture = GestureCompare.preProcess(sensorLog);
-        compareGesture(recordedGesture,gestureTime);
+
 
         try {
-
             plotRecordedGestures(graph, 2);
+            ArrayList<Pair<Long, double[]>> sensorLog = gestureAct.sensorLog;
+            double gestureTime = gestureAct.gestureTime;
+            double[][] recordedGesture = GestureCompare.preProcess(sensorLog);
+            compareGesture(recordedGesture,gestureTime);
         } catch (Exception e) {
             Log.d("Plot Log:", "File Not Found");
             e.printStackTrace();
